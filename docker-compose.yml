@@ -1,0 +1,16 @@
+version: '3.8'
+services:
+  postgres:
+    # 핵심: 일반 postgres가 아닌 pgvector가 설치된 이미지를 사용해야 함
+    image: pgvector/pgvector:pg16
+    container_name: skyland-db
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=secret
+      - POSTGRES_DB=skyland
+    ports:
+      - "5432:5432"
+    volumes:
+      # 데이터를 로컬에 저장해서 컨테이너를 껐다 켜도 데이터가 날아가지 않게 함
+      - ./data/postgres:/var/lib/postgresql/data
+    restart: always
