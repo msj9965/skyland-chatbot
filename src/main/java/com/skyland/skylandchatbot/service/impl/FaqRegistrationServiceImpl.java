@@ -49,5 +49,35 @@ public class FaqRegistrationServiceImpl implements FaqRegistrationService {
 
         log.info("FAQ 등록 프로세스 완료: ID={}", savedEntity.getFaqId());
     }
+
+    /**
+     * FAQ 일괄 등록 프로세스 (배치 처리 최적화)
+     * 1. RDB 일괄 저장
+     * 2. Vector DB 일괄 저장
+     */
+    @Transactional
+    @Override
+    public void registerFaqs(List<FaqCreateRequest> requests) {
+        log.info("FAQ 일괄 등록 시작: {} 개", requests.size());
+
+        // 1. 도메인 객체 리스트 생성
+        List<FaqEntity> faqEntities = requests.stream()
+                .map(FaqEntity::createFrom)
+                .toList();
+
+        // 2. RDB 일괄 저장 (배치 처리)
+        List<FaqEntity> savedEntities = faqRepository.saveAll(faqEntities);
+        log.info("FAQ 원본 일괄 저장 완료: {} 개", savedEntities.size());
+
+        // 3. 벡터 문서 리스트 변환
+        List<Document> documents = savedEntities.stream()
+                .map(documentMapper::toDocument)
+                .toList();
+
+        // 4. 벡터 저장소에 일괄 저장 (배치 처리)
+        vectorStorageService.save(documents);
+
+        log.info("FAQ 일괄 등록 프로세스 완료: {} 개", savedEntities.size());
+    }
 }
 
