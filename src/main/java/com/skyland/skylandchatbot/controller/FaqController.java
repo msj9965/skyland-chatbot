@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.*;
 
 /**
  * FAQ 관련 REST API 컨트롤러
- *
  * SOLID 원칙 적용:
  * - DIP: 구체 클래스(FaqService)가 아닌 인터페이스(FaqRegistrationService)에 의존
  * - SRP: HTTP 요청/응답 처리라는 단일 책임만 수행
