@@ -4,7 +4,7 @@ spring:
     username: postgres
     password: secret
     driver-class-name: org.postgresql.Driver
-    # 2. JPA 설정 (일반 데이터 관리용)
+    # JPA 설정 (일반 데이터 관리용)
     jpa:
       hibernate:
         ddl-auto: update # Entity 변경 시 테이블 자동 업데이트

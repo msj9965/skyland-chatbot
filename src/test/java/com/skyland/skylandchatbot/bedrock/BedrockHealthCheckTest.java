@@ -1,5 +1,6 @@
 package com.skyland.skylandchatbot.bedrock;
 
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.bedrock.titan.BedrockTitanEmbeddingOptions;
@@ -12,10 +13,13 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.ai.bedrock.titan.BedrockTitanEmbeddingModel.*;
 
+@Slf4j
 @SpringBootTest
 class BedrockHealthCheckTest {
 
@@ -31,13 +35,13 @@ class BedrockHealthCheckTest {
     void testChatModel() {
         // Given
         String question = "부천 상동에 있는 스카이랜드 사우나는 어떤 곳이야? 한 문장으로 소개해줘.";
+        log.info("[Chat] 질문 전송: {}", question);
 
         // When
-        System.out.println(">>> [Chat] 질문 전송: " + question);
         String answer = chatModel.call(question);
 
         // Then
-        System.out.println(">>> [Chat] 답변 수신: " + answer);
+        log.info("[Chat] 답변 수신: {}", answer);
         assertThat(answer)
                 .isNotNull()
                 .isNotEmpty();
@@ -48,9 +52,9 @@ class BedrockHealthCheckTest {
     void testEmbeddingModel() {
         // Given
         String text = "이 텍스트를 벡터로 변환해줘.";
+        log.info("[Embed] 변환 요청: {}", text);
 
         // When
-        System.out.println(">>> [Embed] 변환 요청: " + text);
         EmbeddingResponse response = embeddingModel.call(
                 new EmbeddingRequest(List.of(text),
                         BedrockTitanEmbeddingOptions.builder()
@@ -59,20 +63,20 @@ class BedrockHealthCheckTest {
         );
 
         // Then
-        // [해결 3] 반환 타입을 List<Double>에서 float[]로 변경 (최신 버전 스펙)
         float[] vector = response.getResults().getFirst().getOutput();
-        int dimension = vector.length; // size() 대신 length 사용
+        int dimension = vector.length;
 
-        System.out.println(">>> [Embed] 변환 성공!");
-        System.out.println(">>> [Embed] 차원 수(Dimension): " + dimension);
+        // 벡터 데이터의 앞부분 5개만 추출하여 로깅
+        String vectorPreview = IntStream.range(0, Math.min(5, vector.length))
+                .mapToObj(i -> String.format("%.4f", vector[i]))
+                .collect(Collectors.joining(", ", "[", ", ...]"));
 
-        // 출력 확인용 (앞에 5개만)
-        System.out.print(">>> [Embed] 벡터 데이터(일부): [");
-        for(int i=0; i<5; i++) System.out.print(vector[i] + ", ");
-        System.out.println("...]");
+        log.info("[Embed] 변환 성공! 차원 수: {}", dimension);
+        log.info("[Embed] 벡터 데이터(일부): {}", vectorPreview);
 
+        // SonarQube 권장: assertion을 체이닝으로 연결
         assertThat(vector)
                 .isNotEmpty()
-                .hasSize(1024); // Titan v2의 기본 차원은 1024입니다. (설정에 따라 256, 512도 가능하나 default는 1024)
+                .hasSize(1024); // Titan v2의 기본 차원은 1024입니다.
     }
 }
