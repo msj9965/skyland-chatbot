@@ -1,0 +1,23 @@
+spring:
+  # AWS 및 Bedrock 설정
+  ai:
+    bedrock:
+      aws:
+        region: ap-northeast-2  # 서울 리전
+        access-key: ${AWS_ACCESS_KEY_ID}      # 환경변수에서 로드
+        secret-key: ${AWS_SECRET_ACCESS_KEY}  # 환경변수에서 로드
+
+      # 1. Chat 모델 설정 (Claude 3.5 Sonnet)
+      anthropic:
+        chat:
+          enabled: true
+          model: anthropic.claude-3-5-sonnet-20241022-v2:0
+          options:
+            temperature: 0.0  # 사실 기반 답변을 위해 0 설정
+            max-tokens: 1000  # 답변 최대 길이
+
+      # 2. Embedding 모델 설정 (Titan Embeddings v2)
+      titan:
+        embedding:
+          enabled: true
+          model: amazon.titan-embed-text-v2:0
