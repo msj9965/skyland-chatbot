@@ -5,13 +5,13 @@ spring:
     password: secret
     driver-class-name: org.postgresql.Driver
     # JPA 설정 (일반 데이터 관리용)
-    jpa:
+  jpa:
+    hibernate:
+      ddl-auto: update # Entity 변경 시 테이블 자동 업데이트
+    properties:
       hibernate:
-        ddl-auto: update # Entity 변경 시 테이블 자동 업데이트
-      properties:
-        hibernate:
-          format_sql: true # 로그에 SQL 예쁘게 출력
-          dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true # 로그에 SQL 예쁘게 출력
+        dialect: org.hibernate.dialect.PostgreSQLDialect
   # AWS 및 Bedrock 설정
   ai:
     model:
@@ -33,6 +33,7 @@ spring:
       titan:
         embedding:
           model: amazon.titan-embed-text-v2:0
+          input-type: text
     vectorstore:
       pgvector:
         index-type: hnsw
