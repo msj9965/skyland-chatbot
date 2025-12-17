@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: skyland-chatbot
+  profiles:
+    active: dev
