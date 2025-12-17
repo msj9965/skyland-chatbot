@@ -1,5 +1,6 @@
 package com.skyland.skylandchatbot.controller;
 
+import com.skyland.skylandchatbot.dto.FaqBulkCreateRequest;
 import com.skyland.skylandchatbot.dto.FaqCreateRequest;
 import com.skyland.skylandchatbot.service.FaqRegistrationService;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +35,22 @@ public class FaqController {
         log.info("FAQ 등록 요청 수신: category={}, question={}", request.category(), request.question());
 
         faqRegistrationService.registerFaq(request);
+
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    /**
+     * FAQ 일괄 등록 API
+     * [POST] /api/v1/faqs/bulk
+     *
+     * @param request FAQ 일괄 생성 요청
+     * @return 201 Created
+     */
+    @PostMapping("/bulk")
+    public ResponseEntity<Void> registerFaqs(@RequestBody FaqBulkCreateRequest request) {
+        log.info("FAQ 일괄 등록 요청 수신: {} 개", request.faqs().size());
+
+        faqRegistrationService.registerFaqs(request.faqs());
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
