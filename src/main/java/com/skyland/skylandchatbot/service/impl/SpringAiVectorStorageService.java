@@ -24,5 +24,11 @@ public class SpringAiVectorStorageService implements VectorStorageService {
         vectorStore.add(documents);
         log.info("벡터 저장소에 {} 개의 문서 저장 완료", documents.size());
     }
+
+    @Override
+    public void delete(String documentId) {
+        vectorStore.delete(List.of(documentId));
+        log.info("벡터 저장소에서 문서 삭제 완료: documentId={}", documentId);
+    }
 }
 

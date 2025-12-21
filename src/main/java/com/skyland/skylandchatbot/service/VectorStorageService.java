@@ -13,5 +13,11 @@ public interface VectorStorageService {
      * @param documents 저장할 문서 리스트
      */
     void save(List<Document> documents);
+
+    /**
+     * 문서 ID로 벡터 저장소에서 삭제합니다.
+     * @param documentId 삭제할 문서 ID
+     */
+    void delete(String documentId);
 }
 
