@@ -2,6 +2,9 @@ package com.skyland.skylandchatbot.controller;
 
 import com.skyland.skylandchatbot.dto.FaqBulkCreateRequest;
 import com.skyland.skylandchatbot.dto.FaqCreateRequest;
+import com.skyland.skylandchatbot.dto.FaqResponse;
+import com.skyland.skylandchatbot.service.FaqDeletionService;
+import com.skyland.skylandchatbot.service.FaqQueryService;
 import com.skyland.skylandchatbot.service.FaqRegistrationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -9,11 +12,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 /**
  * FAQ 관련 REST API 컨트롤러
- * SOLID 원칙 적용:
- * - DIP: 구체 클래스(FaqService)가 아닌 인터페이스(FaqRegistrationService)에 의존
- * - SRP: HTTP 요청/응답 처리라는 단일 책임만 수행
  */
 @Slf4j
 @RestController
@@ -22,6 +24,8 @@ import org.springframework.web.bind.annotation.*;
 public class FaqController {
 
     private final FaqRegistrationService faqRegistrationService;
+    private final FaqQueryService faqQueryService;
+    private final FaqDeletionService faqDeletionService;
 
     /**
      * FAQ 등록 API
@@ -53,5 +57,52 @@ public class FaqController {
         faqRegistrationService.registerFaqs(request.faqs());
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    /**
+     * FAQ 전체 조회 API
+     * [GET] /api/v1/faqs
+     *
+     * @return 200 OK with FAQ 리스트
+     */
+    @GetMapping
+    public ResponseEntity<List<FaqResponse>> getAllFaqs() {
+        log.info("FAQ 전체 조회 요청 수신");
+
+        List<FaqResponse> faqs = faqQueryService.findAllFaqs();
+
+        return ResponseEntity.ok(faqs);
+    }
+
+    /**
+     * FAQ 단건 조회 API
+     * [GET] /api/v1/faqs/{faqId}
+     *
+     * @param faqId FAQ ID
+     * @return 200 OK with FAQ 정보
+     */
+    @GetMapping("/{faqId}")
+    public ResponseEntity<FaqResponse> getFaqById(@PathVariable Long faqId) {
+        log.info("FAQ 단건 조회 요청 수신: ID={}", faqId);
+
+        FaqResponse faq = faqQueryService.findFaqById(faqId);
+
+        return ResponseEntity.ok(faq);
+    }
+
+    /**
+     * FAQ 단건 삭제 API
+     * [DELETE] /api/v1/faqs/{faqId}
+     *
+     * @param faqId 삭제할 FAQ ID
+     * @return 204 No Content
+     */
+    @DeleteMapping("/{faqId}")
+    public ResponseEntity<Void> deleteFaq(@PathVariable Long faqId) {
+        log.info("FAQ 단건 삭제 요청 수신: ID={}", faqId);
+
+        faqDeletionService.deleteFaq(faqId);
+
+        return ResponseEntity.noContent().build();
     }
 }
